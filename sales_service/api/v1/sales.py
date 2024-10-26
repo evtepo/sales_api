@@ -52,17 +52,7 @@ async def get_sales(
         description="Usage: 5 for >= or -5 for <=",
     ),
 ):
-    return await sale_logic.get_list_of_sales(
-        size,
-        page,
-        city,
-        store,
-        product,
-        days,
-        price,
-        amount,
-        session,
-    )
+    return await sale_logic.get_list_of_sales(size, page, city, store, product, days, price, amount, session)
 
 
 @router.put("/", response_model=SaleResponse, status_code=status.HTTP_200_OK)
