@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import DateTime, Numeric, ForeignKey, String, Text
+from sqlalchemy import DateTime, ForeignKey, func, Integer, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.db_connect import Base
@@ -12,10 +12,15 @@ from models.location import Store
 class Sales(Base, TableMixin):
     store_id: Mapped[UUID] = mapped_column(ForeignKey("store.id", ondelete="CASCADE"), nullable=False)
     city_id: Mapped[UUID] = mapped_column(ForeignKey("city.id", ondelete="CASCADE"), nullable=False)
-    amount: Mapped[float] = mapped_column(Numeric(precision=9, scale=2), nullable=False)
-    sale_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
+    amount: Mapped[int] = mapped_column(Integer, nullable=False)
+    price: Mapped[float] = mapped_column(Numeric(precision=9, scale=2), nullable=False)
+    sale_date: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
 
-    products: Mapped["Product"] = relationship(back_populates="sales")
+    products: Mapped[list["Product"]] = relationship(back_populates="sales")
 
 
 class Product(Base, TableMixin):
@@ -23,14 +28,14 @@ class Product(Base, TableMixin):
     description: Mapped[str] = mapped_column(Text)
     price: Mapped[float] = mapped_column(Numeric(precision=9, scale=2), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.now,
+        DateTime(timezone=True),
+        server_default=func.now(),
         nullable=False,
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.now,
-        onupdate=datetime.now,
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
         nullable=False,
     )
     store_id: Mapped[UUID] = mapped_column(ForeignKey("store.id", ondelete="CASCADE"), nullable=False)
