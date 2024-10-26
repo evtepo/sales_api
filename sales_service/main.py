@@ -3,6 +3,7 @@ from fastapi import FastAPI
 
 from api.v1.city import router as city_router
 from api.v1.product import router as product_router
+from api.v1.sales import router as sales_router
 from api.v1.store import router as store_router
 from configs.settings import settings
 
@@ -11,6 +12,7 @@ app = FastAPI(title=settings.service_name)
 
 app.include_router(city_router)
 app.include_router(product_router)
+app.include_router(sales_router)
 app.include_router(store_router)
 
 
