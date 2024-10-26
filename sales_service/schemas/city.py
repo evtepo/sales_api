@@ -7,14 +7,14 @@ class NameCityMixin(BaseModel):
     name: str
 
 
-class IdCityMixin(BaseModel):
+class CityIdMixin(BaseModel):
     id: UUID
 
 
 class CreateCity(NameCityMixin): ...
 
 
-class UpdateCity(IdCityMixin, NameCityMixin): ...
+class UpdateCity(CityIdMixin, NameCityMixin): ...
 
 
-class DeleteCity(IdCityMixin): ...
+class DeleteCity(CityIdMixin): ...
