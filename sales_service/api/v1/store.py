@@ -2,7 +2,6 @@ from uuid import UUID
 
 from fastapi import APIRouter, Query, status
 
-from models.location import Store
 from schemas.response import SingleStoreResponse, StoreResponse
 from schemas.store import CreateStore, DeleteStore, UpdateStore
 from services.store import (
@@ -20,12 +19,12 @@ router = APIRouter(prefix="/api/v1/store", tags=["Store"])
 
 @router.post("/", response_model=StoreResponse, status_code=status.HTTP_201_CREATED)
 async def create_store(store: CreateStore, repository: repository_dependency, session: db_dependency):
-    return await new_store(store, Store, repository, session)
+    return await new_store(store, repository, session)
 
 
 @router.get("/{store_id}", response_model=SingleStoreResponse, status_code=status.HTTP_200_OK)
 async def get_store(store_id: UUID, repository: repository_dependency, session: db_dependency):
-    return await get_single_store(store_id, Store, repository, session)
+    return await get_single_store(store_id, repository, session)
 
 
 @router.get(
@@ -39,14 +38,14 @@ async def get_stores(
     page: int = Query(ge=1, default=1),
     size: int = Query(ge=10, le=50, default=10),
 ):
-    return await get_list_of_stores(size, page, Store, repository, session)
+    return await get_list_of_stores(size, page, repository, session)
 
 
 @router.put("/", response_model=StoreResponse, status_code=status.HTTP_200_OK)
 async def update_store(store: UpdateStore, repository: repository_dependency, session: db_dependency):
-    return await update_store_by_id(store, Store, repository, session)
+    return await update_store_by_id(store, repository, session)
 
 
 @router.delete("/", response_model=dict[str, str], status_code=status.HTTP_200_OK)
 async def delete_store(store: DeleteStore, repository: repository_dependency, session: db_dependency):
-    return await delete_store_by_id(store, Store, repository, session)
+    return await delete_store_by_id(store, repository, session)
