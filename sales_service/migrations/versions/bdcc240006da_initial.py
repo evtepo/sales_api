@@ -1,8 +1,8 @@
 """Initial
 
-Revision ID: 44c7a1c2ef40
+Revision ID: bdcc240006da
 Revises: 
-Create Date: 2024-10-25 23:16:26.281666
+Create Date: 2024-10-26 23:21:37.780912
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '44c7a1c2ef40'
+revision: str = 'bdcc240006da'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -35,8 +35,9 @@ def upgrade() -> None:
     op.create_table('sales',
     sa.Column('store_id', sa.Uuid(), nullable=False),
     sa.Column('city_id', sa.Uuid(), nullable=False),
-    sa.Column('amount', sa.Numeric(precision=9, scale=2), nullable=False),
-    sa.Column('sale_date', sa.DateTime(), nullable=False),
+    sa.Column('amount', sa.Integer(), nullable=False),
+    sa.Column('price', sa.Numeric(precision=9, scale=2), nullable=False),
+    sa.Column('sale_date', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.ForeignKeyConstraint(['city_id'], ['city.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['store_id'], ['store.id'], ondelete='CASCADE'),
@@ -46,8 +47,8 @@ def upgrade() -> None:
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('description', sa.Text(), nullable=False),
     sa.Column('price', sa.Numeric(precision=9, scale=2), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('store_id', sa.Uuid(), nullable=False),
     sa.Column('sales_id', sa.Uuid(), nullable=True),
     sa.Column('id', sa.Uuid(), nullable=False),
