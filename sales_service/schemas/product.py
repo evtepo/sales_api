@@ -12,7 +12,6 @@ class ProductMixin(BaseModel):
     description: str | None
     price: float
     store_id: UUID
-    sales_id: UUID | None
 
 
 class CreateProduct(ProductMixin): ...
