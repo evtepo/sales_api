@@ -148,6 +148,9 @@ class SalesLogic:
         products: list[UUID],
         session: AsyncSession,
     ):
+        """
+        Метод для удаления или добавления Sales ID в Product.
+        """
         price, amount = 0.0, 0
         for product_id in products:
             filters = {"id": product_id}

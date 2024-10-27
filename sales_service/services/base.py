@@ -100,6 +100,9 @@ class BaseService:
         return result
 
     async def check_row(self, row_id: UUID, model: Model, session: AsyncSession):
+        """
+        Метод для проверки существования строки с указанным ID.
+        """
         check_query = select(model).filter(model.id == row_id)
 
         result = await session.execute(check_query)
