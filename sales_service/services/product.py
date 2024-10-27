@@ -2,6 +2,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from models.location import Store
 from models.product import Product
 from repository.repository import BaseRepository
 from schemas.product import CreateProduct, DeleteProduct, UpdateProduct
@@ -10,6 +11,11 @@ from services.base import BaseService
 
 class ProductService(BaseService):
     async def new_product(self, product: CreateProduct, repository: BaseRepository, session: AsyncSession):
+        store_id = product.model_dump().get("store_id")
+        check_store = await self.check_row(store_id, Store, session)
+        if check_store:
+            return check_store
+
         return await self.create_new_row(product, Product, repository, session)
 
     async def get_single_product(self, product_id: UUID, repository: BaseRepository, session: AsyncSession):
@@ -20,6 +26,11 @@ class ProductService(BaseService):
         return await self.get_list_rows(offset, limit, Product, repository, session)
 
     async def update_product_by_id(self, product: UpdateProduct, repository: BaseRepository, session: AsyncSession):
+        store_id = product.model_dump().get("store_id")
+        check_store = await self.check_row(store_id, Store, session)
+        if check_store:
+            return check_store
+
         return await self.update_row_by_id(product, Product, repository, session)
 
     async def delete_product_by_id(self, product: DeleteProduct, repository: BaseRepository, session: AsyncSession):
