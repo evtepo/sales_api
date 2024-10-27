@@ -1,6 +1,8 @@
 from typing import TypeVar
 from uuid import UUID
 
+from fastapi import status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.product import Product, Sales
@@ -96,3 +98,13 @@ class BaseService:
             return error_response("Can't delete data with this ID.")
 
         return result
+
+    async def check_row(self, row_id: UUID, model: Model, session: AsyncSession):
+        check_query = select(model).filter(model.id == row_id)
+
+        result = await session.execute(check_query)
+        result = result.scalar_one_or_none()
+        if not result:
+            return error_response("Wrong ID.", status.HTTP_400_BAD_REQUEST)
+
+        return None
