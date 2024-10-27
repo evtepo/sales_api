@@ -1,0 +1,32 @@
+version: '3.5'
+services:
+  sales_nginx:
+    image: nginx:latest
+    container_name: sales_nginx
+    depends_on:
+      - sales_service
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    ports:
+      - "80:80"
+
+  sales_service:
+    build: ./sales_service
+    container_name: sales_service
+    depends_on:
+      - sales_postgres
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./sales_service/configs/.env.example
+
+  sales_postgres:
+    image: postgres:latest
+    container_name: sales_postgres
+    expose:
+      - "5432"
+    env_file:
+      - ./sales_service/configs/.env.example
+    volumes:
+      - /postgresql/sales_data:/var/lib/postgresql/data
