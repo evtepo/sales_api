@@ -2,7 +2,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.location import Store
+from models.location import City, Store
 from repository.repository import BaseRepository
 from schemas.store import CreateStore, DeleteStore, UpdateStore
 from services.base import BaseService
@@ -10,6 +10,11 @@ from services.base import BaseService
 
 class StoreService(BaseService):
     async def new_store(self, store: CreateStore, repository: BaseRepository, session: AsyncSession):
+        city_id = store.model_dump().get("city_id")
+        check_city = await self.check_row(city_id, City, session)
+        if check_city:
+            return check_city
+
         return await self.create_new_row(store, Store, repository, session)
 
     async def get_single_store(self, store_id: UUID, repository: BaseRepository, session: AsyncSession):
@@ -20,6 +25,11 @@ class StoreService(BaseService):
         return await self.get_list_rows(offset, limit, Store, repository, session)
 
     async def update_store_by_id(self, store: UpdateStore, repository: BaseRepository, session: AsyncSession):
+        city_id = store.model_dump().get("city_id")
+        check_city = await self.check_row(city_id, City, session)
+        if check_city:
+            return check_city
+
         return await self.update_row_by_id(store, Store, repository, session)
 
     async def delete_store_by_id(self, store: DeleteStore, repository: BaseRepository, session: AsyncSession):
