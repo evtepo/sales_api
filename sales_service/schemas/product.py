@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class ProductIdMixin(BaseModel):
@@ -12,6 +12,13 @@ class ProductMixin(BaseModel):
     description: str | None
     price: float
     store_id: UUID
+
+    @field_validator("price")
+    def validate_price(cls, price: float):
+        if price < 0:
+            raise ValueError("Price must be greater than or equal to 0.")
+
+        return price
 
 
 class CreateProduct(ProductMixin): ...
