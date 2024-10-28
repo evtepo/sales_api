@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.location import City
@@ -9,20 +10,20 @@ from services.base import BaseService
 
 
 class CityService(BaseService):
-    async def new_city(self, data: CreateCity, repository: BaseRepository, session: AsyncSession):
+    async def new_city(self, data: CreateCity, repository: BaseRepository, session: AsyncSession) -> City:
         return await self.create_new_row(data, City, repository, session)
 
-    async def get_single_city(self, city_id: UUID, repository: BaseRepository, session: AsyncSession):
+    async def get_single_city(self, city_id: UUID, repository: BaseRepository, session: AsyncSession) -> City | JSONResponse:
         related_fields = ("stores",)
         return await self.get_single_row(city_id, related_fields, City, repository, session)
 
-    async def get_list_of_cities(self, offset: int, limit: int, repository: BaseRepository, session: AsyncSession):
+    async def get_list_of_cities(self, offset: int, limit: int, repository: BaseRepository, session: AsyncSession) -> dict[str, dict | list[City]]:
         return await self.get_list_rows(offset, limit, City, repository, session)
 
-    async def update_city_by_id(self, data: UpdateCity, repository: BaseRepository, session: AsyncSession):
+    async def update_city_by_id(self, data: UpdateCity, repository: BaseRepository, session: AsyncSession) -> City | JSONResponse:
         return await self.update_row_by_id(data, City, repository, session)
 
-    async def delete_city_by_id(self, data: DeleteCity, repository: BaseRepository, session: AsyncSession):
+    async def delete_city_by_id(self, data: DeleteCity, repository: BaseRepository, session: AsyncSession) -> dict[str, str] | JSONResponse:
         return await self.delete_row_by_id(data, City, repository, session)
 
 

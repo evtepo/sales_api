@@ -14,7 +14,7 @@ class ProductMixin(BaseModel):
     store_id: UUID
 
     @field_validator("price")
-    def validate_price(cls, price: float):
+    def validate_price(cls, price: float) -> float:
         if price < 0:
             raise ValueError("Price must be greater than or equal to 0.")
 

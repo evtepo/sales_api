@@ -20,19 +20,19 @@ class BaseRepository(ABC):
         session: AsyncSession,
         related_fields: tuple[str] | None = None,
         **filters,
-    ): ...
+    ) -> Model: ...
 
     @abstractmethod
-    async def get_list(self, model: Model, session: AsyncSession, limit: int, offset: int, **filters): ...
+    async def get_list(self, model: Model, session: AsyncSession, limit: int, offset: int, **filters) -> list[Model | None]: ...
 
     @abstractmethod
-    async def create(self, data: dict, model: Model, session: AsyncSession): ...
+    async def create(self, data: dict, model: Model, session: AsyncSession) -> Model: ...
 
     @abstractmethod
-    async def update(self, data: dict, model: Model, session: AsyncSession, **filters): ...
+    async def update(self, data: dict, model: Model, session: AsyncSession, **filters) -> Model: ...
 
     @abstractmethod
-    async def delete(self, model: Model, session: AsyncSession, **filters): ...
+    async def delete(self, model: Model, session: AsyncSession, **filters) -> dict[str, str] | None: ...
 
 
 class PostgresRepository(BaseRepository):
@@ -42,7 +42,7 @@ class PostgresRepository(BaseRepository):
         session: AsyncSession,
         related_fields: tuple[str] | None = None,
         **filters,
-    ):
+    ) -> Model | None:
         query = select(model).filter_by(**filters)
         if related_fields:
             query = query.options(*(joinedload(getattr(model, field)) for field in related_fields))
@@ -51,13 +51,13 @@ class PostgresRepository(BaseRepository):
 
         return data.unique().scalar_one_or_none()
 
-    async def get_list(self, model: Model, session: AsyncSession, limit: int, offset: int, **filters):
+    async def get_list(self, model: Model, session: AsyncSession, limit: int, offset: int, **filters) -> list[Model | None]:
         query = select(model).filter_by(**filters).limit(limit).offset(offset)
         result = await session.execute(query)
 
         return result.scalars().all()
 
-    async def create(self, data: dict, model: Model, session: AsyncSession):
+    async def create(self, data: dict, model: Model, session: AsyncSession) -> Model:
         instance = model(**data)
         session.add(instance)
         await session.commit()
@@ -65,7 +65,7 @@ class PostgresRepository(BaseRepository):
 
         return instance
 
-    async def update(self, data: dict, model: Model, session: AsyncSession, **filters):
+    async def update(self, data: dict, model: Model, session: AsyncSession, **filters) -> Model:
         update_query = update(model).values(**data).filter_by(**filters)
         await session.execute(update_query)
         await session.commit()
@@ -75,7 +75,7 @@ class PostgresRepository(BaseRepository):
 
         return instance.scalar_one_or_none()
 
-    async def delete(self, model: Model, session: AsyncSession, **filters):
+    async def delete(self, model: Model, session: AsyncSession, **filters) -> dict[str, str] | None:
         select_query = select(model).filter_by(**filters)
         instance = await session.execute(select_query)
         if not instance.scalar_one_or_none():

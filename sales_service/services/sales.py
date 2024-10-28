@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, UTC
 from uuid import UUID, uuid4
 
 from fastapi import status
+from fastapi.responses import JSONResponse
 from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
@@ -13,7 +14,7 @@ from utils.error_handling import error_response
 
 
 class SalesLogic:
-    async def new_sale(self, sale: CreateSale, session: AsyncSession):
+    async def new_sale(self, sale: CreateSale, session: AsyncSession) -> Sales | JSONResponse:
         data = sale.model_dump()
         data["amount"], data["price"], data["id"] = 0, 0, uuid4()
         products = data.get("products")
@@ -33,7 +34,7 @@ class SalesLogic:
 
         return instance
 
-    async def get_single_sale(self, sale_id: UUID, repository: BaseRepository, session: AsyncSession):
+    async def get_single_sale(self, sale_id: UUID, repository: BaseRepository, session: AsyncSession) -> Sales | JSONResponse:
         filters = {"id": sale_id}
         related_fields = ("products",)
         result = await repository.get_single(Sales, session, related_fields, **filters)
@@ -53,7 +54,7 @@ class SalesLogic:
         price: float | None,
         amount: int | None,
         session: AsyncSession,
-    ):
+    ) -> dict[str, dict[str, int] | list[Sales]]:
         query = select(Sales)
         if city:
             query = query.filter(Sales.city_id == city)
@@ -96,7 +97,7 @@ class SalesLogic:
             "data": result,
         }
 
-    async def update_sale_by_id(self, sale: UpdateSale, session: AsyncSession):
+    async def update_sale_by_id(self, sale: UpdateSale, session: AsyncSession) -> Sales | JSONResponse:
         data = sale.model_dump()
         filters = {"id": data.get("id")}
         products = data.get("products")
@@ -121,7 +122,7 @@ class SalesLogic:
 
         return instance
 
-    async def delete_sale_by_id(self, sale: DeleteSale, session: AsyncSession):
+    async def delete_sale_by_id(self, sale: DeleteSale, session: AsyncSession) -> dict[str, str] | JSONResponse:
         data = sale.model_dump()
         filters = {"id": data.get("id")}
         select_query = select(Sales).filter_by(**filters).options(joinedload(Sales.products))
@@ -147,7 +148,7 @@ class SalesLogic:
         method: str,
         products: list[UUID],
         session: AsyncSession,
-    ):
+    ) -> None | JSONResponse:
         """
         Метод для удаления или добавления Sales ID в Product.
         """
